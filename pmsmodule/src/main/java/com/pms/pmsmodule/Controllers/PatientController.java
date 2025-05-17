@@ -40,12 +40,15 @@ public class PatientController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponseDTO> updatePatientData(
-            @PathVariable UUID id, @Validated(Default.class) @RequestBody PatientRequestDT0 patientData){
-        if(id == null){
-            throw new NullPointerException("Patient Id is null");
-        }
+            @PathVariable UUID id, @Validated({Default.class}) @RequestBody PatientRequestDT0 patientData){
+
         PatientResponseDTO updatedPatientData = patientService.updatePatientData(id, patientData);
         return ResponseEntity.ok().body(updatedPatientData);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable UUID id){
+        patientService.deletePatient(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -7,7 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-@Data
+@Getter
+@Setter
 public class PatientRequestDT0 {
 
     @NotBlank(message = "Name is required")
