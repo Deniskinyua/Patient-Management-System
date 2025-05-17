@@ -54,12 +54,34 @@ public class PatientService {
     }
     // Create a patient
     public PatientResponseDTO createPatient(PatientRequestDT0 patientRequestDT0){
-        if(patientRepository.existsByEmail(patientRequestDT0.getEmail())){
-            throw new EmailAlreadyExistsException("An patient with this email already exists"+patientRequestDT0);
-        }
-        Patient newPatient = patientRepository.save(PatientMapper.mapDTOtoModel(patientRequestDT0));
+        String email = patientRequestDT0.getEmail();
 
-        return PatientMapper.mapModelToDTO(newPatient);
+        // Check for active patients with the same email
+        if (patientRepository.existsByEmailAndDeletedFalse(email)) {
+            throw new EmailAlreadyExistsException("A patient with this email already exists");
+        }
+        // Check for a soft-deleted patient with the same email
+        Optional<Patient> softDeletedPatientOpt = patientRepository.findByEmailAndDeletedTrue(email);
+
+        if (softDeletedPatientOpt.isPresent()) {
+            Patient softDeletedPatient = softDeletedPatientOpt.get();
+
+            // Reactivate the patient and update values
+            softDeletedPatient.setDeleted(false);
+            softDeletedPatient.setName(patientRequestDT0.getName());
+            softDeletedPatient.setAddress(patientRequestDT0.getAddress());
+            softDeletedPatient.setDateOfBirth(LocalDate.parse(patientRequestDT0.getDateOfBirth()));
+            softDeletedPatient.setRegisteredDate(LocalDate.parse(patientRequestDT0.getRegisteredDate()));
+
+            Patient reactivatedPatient = patientRepository.save(softDeletedPatient);
+            return PatientMapper.mapModelToDTO(reactivatedPatient);
+        }
+
+        // Create new patient
+        Patient newPatient = PatientMapper.mapDTOtoModel(patientRequestDT0);
+        Patient savedPatient = patientRepository.save(newPatient);
+
+        return PatientMapper.mapModelToDTO(savedPatient);
     }
     //Update patient data
     public PatientResponseDTO updatePatientData(UUID patientId, PatientRequestDT0 patientData) {

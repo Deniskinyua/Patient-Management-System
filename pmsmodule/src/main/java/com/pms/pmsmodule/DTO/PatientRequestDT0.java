@@ -27,4 +27,6 @@ public class PatientRequestDT0 {
 
     @NotBlank(groups = CreatePatientValidationGroup.class, message = "Registered date is required")
     private String registeredDate;
+
+    private boolean deleted;
 }
