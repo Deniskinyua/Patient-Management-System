@@ -53,11 +53,12 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PatientResponseDTO> updatePatientData(
+    public ResponseEntity<ApiResponse> updatePatientData(
             @PathVariable UUID id, @Validated({Default.class}) @RequestBody PatientRequestDT0 patientData){
 
         PatientResponseDTO updatedPatientData = patientService.updatePatientData(id, patientData);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedPatientData);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse("Patient successfully updated", LocalDateTime.now()));
     }
 
     @DeleteMapping("/{id}")
