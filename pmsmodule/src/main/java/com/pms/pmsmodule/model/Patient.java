@@ -10,9 +10,10 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.UUID;
-//! Remember to test with @Setter, @Getter annotations
+
 @Entity
-@Data
+@Getter
+@Setter
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,4 +35,6 @@ public class Patient {
 
     @NotNull
     private LocalDate registeredDate;
+
+    private boolean deleted = false;
 }
