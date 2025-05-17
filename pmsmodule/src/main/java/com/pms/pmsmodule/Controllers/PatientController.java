@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import lombok.Builder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +22,6 @@ import java.util.UUID;
 @RequestMapping("/patients")
 public class PatientController {
     private final PatientService patientService;
-
     public PatientController(PatientService patientService) {
         this.patientService = patientService;
     }
@@ -39,12 +39,6 @@ public class PatientController {
         PatientResponseDTO patient = patientService.getPatientById(id);
         return ResponseEntity.ok().body(patient);
     }
-
-    /**
-     * GET : createPatient - Create a new Patient
-     * @param patientRequest
-     * @return
-     */
 
     @PostMapping
     public ResponseEntity<PatientResponseDTO> createPatient(
