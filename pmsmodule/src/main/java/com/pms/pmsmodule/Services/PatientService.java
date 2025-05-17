@@ -9,6 +9,9 @@ import com.pms.pmsmodule.Repository.PatientRepository;
 import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class PatientService {
+
     private final  PatientRepository patientRepository;
 
     //constructor
@@ -37,6 +41,16 @@ public class PatientService {
                 .filter(patient -> !patient.isDeleted())
                 .map(PatientMapper::mapModelToDTO)
                 .toList();
+    }
+    // Get Patient by Id
+
+    public PatientResponseDTO getPatientById(UUID id){
+        //If the patient does not exit, return message to user : PatientNotFoundException
+        //
+        Patient patient = patientRepository.findByIdAndDeletedFalse(id).orElseThrow(
+                ()-> new PatientNotFoundException("Patient not found"));
+
+        return PatientMapper.mapModelToDTO(patient);
     }
     // Create a patient
     public PatientResponseDTO createPatient(PatientRequestDT0 patientRequestDT0){
