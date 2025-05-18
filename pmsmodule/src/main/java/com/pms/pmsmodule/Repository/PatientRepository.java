@@ -17,4 +17,7 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
      * Create an optional since patient could be deleted
      */
     Optional<Patient> findByIdAndDeletedFalse(UUID id);
+    Optional<Patient> findByEmailAndDeletedTrue(String email);
+
+    boolean existsByEmailAndDeletedFalse(String email);
 }
