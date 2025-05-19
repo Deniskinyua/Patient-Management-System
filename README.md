@@ -4,16 +4,16 @@ THealth is an enterprise-grade patient management system that provdes apis to be
 
 ### **Technology Stack Used**
 #### Languages: 
-- Java, Spring boot
+> Java, Spring boot
 #### Database 
-- Microsoft SQL Server (SQL)
+> Microsoft SQL Server (SQL)
 #### DevOps Tools
-- Docker, Load Balancers & API Gateway
+> Docker, Load Balancers & API Gateway
 #### Messaging & Real-Time Communication
-- Kafka, REST & gRPC
+> Kafka, REST & gRPC
 #### Security
-- Authentication & Authorization using Spring Security
+> Authentication & Authorization using Spring Security
 #### Testing
-- JUnit Unit Testing & Integration Testing
+> JUnit Unit Testing & Integration Testing
 #### Deployment/Production 
-- Amazon Web Services (AWS) using Localstack, Cloudformation (Infrastructure as Code - IaC)
+> Amazon Web Services (AWS) using Localstack, Cloudformation (Infrastructure as Code - IaC)
