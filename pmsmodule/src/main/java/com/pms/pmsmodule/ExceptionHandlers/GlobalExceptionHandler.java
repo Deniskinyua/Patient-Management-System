@@ -22,7 +22,7 @@ import java.util.Map;
  * Each method handles a specific exception and maps it to a meaningful HTTP response.
  * </p>
  *
- * @author ---
+ * @author DenisKinyua
  * @since 1.0
  */
 @ControllerAdvice

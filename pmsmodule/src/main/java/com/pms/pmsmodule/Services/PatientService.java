@@ -21,7 +21,7 @@ import java.util.UUID;
  * Handles patient creation, update, retrieval, and soft deletion logic.
  * Integrates with {@link PatientRepository} and uses DTOs for data transfer.
  *
- * @author
+ * @author DenisKinyua
  */
 @Slf4j
 @Service

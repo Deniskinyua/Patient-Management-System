@@ -19,7 +19,7 @@ import java.util.UUID;
  * to perform database interactions related to patient entities.
  * </p>
  *
- * @author ---
+ * @author DenisKinyua
  * @since 1.0
  */
 @Repository
