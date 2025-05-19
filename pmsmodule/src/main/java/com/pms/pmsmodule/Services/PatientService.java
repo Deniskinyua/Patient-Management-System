@@ -9,64 +9,82 @@ import com.pms.pmsmodule.Repository.PatientRepository;
 import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-//! Remember to test si @Noargs and @AllArgs constructor annotations
 
+/**
+ * Service class for managing patient-related operations.
+ * Handles patient creation, update, retrieval, and soft deletion logic.
+ * Integrates with {@link PatientRepository} and uses DTOs for data transfer.
+ *
+ * @author DenisKinyua
+ */
 @Slf4j
 @Service
 public class PatientService {
 
-    private final  PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    //constructor
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param patientRepository repository used to access patient data
+     */
     public PatientService(PatientRepository patientRepository){
         this.patientRepository = patientRepository;
     }
 
-    //Get all patients
+    /**
+     * Retrieves a list of all active (non-deleted) patients.
+     *
+     * @return a list of {@link PatientResponseDTO} objects
+     */
     public List<PatientResponseDTO> getAllPatients(){
         List<Patient> patients = patientRepository.findAll();
-        //.map(patient -> PatientMapper.mapModelToDTO(patient));
-
         return patients.stream()
                 .filter(patient -> !patient.isDeleted())
                 .map(PatientMapper::mapModelToDTO)
                 .toList();
     }
-    // Get Patient by Id
 
+    /**
+     * Retrieves a patient by their unique identifier.
+     *
+     * @param id UUID of the patient
+     * @return corresponding {@link PatientResponseDTO}
+     * @throws PatientNotFoundException if the patient is not found or marked as deleted
+     */
     public PatientResponseDTO getPatientById(UUID id){
-        //If the patient does not exit, return message to user : PatientNotFoundException
-        //
         Patient patient = patientRepository.findByIdAndDeletedFalse(id).orElseThrow(
-                ()-> new PatientNotFoundException("Patient not found"));
+                () -> new PatientNotFoundException("Patient not found"));
 
         return PatientMapper.mapModelToDTO(patient);
     }
-    // Create a patient
+
+    /**
+     * Creates a new patient or reactivates a previously soft-deleted one.
+     * Prevents duplicate emails for active patients.
+     *
+     * @param patientRequestDT0 the incoming patient data
+     * @return the created or reactivated {@link PatientResponseDTO}
+     * @throws EmailAlreadyExistsException if an active patient with the same email exists
+     */
     public PatientResponseDTO createPatient(PatientRequestDT0 patientRequestDT0){
         String email = patientRequestDT0.getEmail();
 
-        // Check for active patients with the same email
         if (patientRepository.existsByEmailAndDeletedFalse(email)) {
             throw new EmailAlreadyExistsException("A patient with this email already exists");
         }
-        // Check for a soft-deleted patient with the same email
+
         Optional<Patient> softDeletedPatientOpt = patientRepository.findByEmailAndDeletedTrue(email);
 
         if (softDeletedPatientOpt.isPresent()) {
             Patient softDeletedPatient = softDeletedPatientOpt.get();
 
-            // Reactivate the patient and update values
             softDeletedPatient.setDeleted(false);
             softDeletedPatient.setName(patientRequestDT0.getName());
             softDeletedPatient.setAddress(patientRequestDT0.getAddress());
@@ -77,44 +95,57 @@ public class PatientService {
             return PatientMapper.mapModelToDTO(reactivatedPatient);
         }
 
-        // Create new patient
         Patient newPatient = PatientMapper.mapDTOtoModel(patientRequestDT0);
         Patient savedPatient = patientRepository.save(newPatient);
-
         return PatientMapper.mapModelToDTO(savedPatient);
     }
-    //Update patient data
-    public PatientResponseDTO updatePatientData(UUID patientId, PatientRequestDT0 patientData) {
 
+    /**
+     * Updates an existing patient's data.
+     * Ensures no duplicate emails across different patients.
+     *
+     * @param patientId   the UUID of the patient to update
+     * @param patientData the new patient data
+     * @return updated {@link PatientResponseDTO}
+     * @throws PatientNotFoundException if the patient doesn't exist or is deleted
+     * @throws EmailAlreadyExistsException if another patient already uses the provided email
+     */
+    public PatientResponseDTO updatePatientData(UUID patientId, PatientRequestDT0 patientData) {
         Patient getPatient = patientRepository.findByIdAndDeletedFalse(patientId).orElseThrow(
                 () -> new PatientNotFoundException("Patient not found"));
 
         if (patientRepository.existsByEmailAndIdNot(patientData.getEmail(), patientId)) {
-            throw new EmailAlreadyExistsException("A patient with this email already exists ");
+            throw new EmailAlreadyExistsException("A patient with this email already exists");
         }
+
         getPatient.setName(patientData.getName());
         getPatient.setAddress(patientData.getAddress());
         getPatient.setEmail(patientData.getEmail());
         getPatient.setDateOfBirth(LocalDate.parse(patientData.getDateOfBirth()));
+
         Patient updatedPatient = patientRepository.save(getPatient);
         return PatientMapper.mapModelToDTO(updatedPatient);
     }
+
     /**
-     * deletePatient
-     * @param
-     * @return
+     * Soft deletes a patient by setting the "deleted" flag to true.
+     * Uses a transactional context to ensure data consistency.
+     * Logs deletion for traceability and audit purposes.
+     *
+     * @param id UUID of the patient to delete
+     * @throws PatientNotFoundException if patient not found or already deleted
      */
     @Transactional
     public void deletePatient(UUID id){
         Patient patient = patientRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found."));
-        //soft delete by updating the column to true(1)
-        patient.setDeleted(true);
-        patientRepository.save(patient); //!Check here --
 
-        //!Remember to add audit logging
-        //Add Audit logging for activity tracking
-        //auditLogger.logAction("DELETE", "Patient", id.toString()" "deleted");
+        patient.setDeleted(true);
+        patientRepository.save(patient);
+
+        // TODO: Add audit logging for traceability
+        // auditLogger.logAction("DELETE", "Patient", id.toString() + " deleted");
+
         log.info("Patient with Id: {} deleted", id);
     }
 }
