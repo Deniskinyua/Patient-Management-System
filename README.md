@@ -1,4 +1,4 @@
-THealth Patient Management System
+## THealth Patient Management System
 
 THealth is an enterprise-grade patient management system that provdes apis to be consumed in managing patients in any health facility/entity.
 
@@ -17,3 +17,12 @@ THealth is an enterprise-grade patient management system that provdes apis to be
 > JUnit Unit Testing & Integration Testing
 #### Deployment/Production 
 > Amazon Web Services (AWS) using Localstack, Cloudformation (Infrastructure as Code - IaC)
+
+### System Design & Architecture
+#### Development System Design
+![Development Architecture](https://github.com/user-attachments/assets/afa17ce3-f16d-42a3-bf09-eff327ab0585)
+
+#### Deployment System Design 
+![Deployment-Architecture](https://github.com/user-attachments/assets/3a9238bd-0fbc-47e7-91af-4606b0c157d4)
+
+
