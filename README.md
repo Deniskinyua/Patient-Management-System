@@ -17,6 +17,8 @@ THealth is an enterprise-grade patient management system that provdes apis to be
 > JUnit Unit Testing & Integration Testing
 #### Deployment/Production 
 > Amazon Web Services (AWS) using Localstack, Cloudformation (Infrastructure as Code - IaC)
+##### API Documentation
+> OpenAPI, JavaDoc & SpringDoc
 
 ### System Design & Architecture
 #### Development System Design
