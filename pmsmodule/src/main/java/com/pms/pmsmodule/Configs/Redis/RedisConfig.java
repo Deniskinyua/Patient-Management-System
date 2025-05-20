@@ -1,5 +1,8 @@
 package com.pms.pmsmodule.Configs.Redis;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.pms.pmsmodule.DTO.PatientRequestDT0;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,18 +18,21 @@ import java.time.Duration;
 public class RedisConfig {
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory){
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
-                .disableCachingNullValues()
+        Jackson2JsonRedisSerializer<Object> jacksonSerializer =
+                new Jackson2JsonRedisSerializer<>(Object.class);
+        jacksonSerializer.setObjectMapper(objectMapper);
+
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(60))
                 .serializeValuesWith(RedisSerializationContext
                         .SerializationPair
-                        .fromSerializer(new Jackson2JsonRedisSerializer<>(PatientRequestDT0.class))
-                );
-        return RedisCacheManager
-                .builder(connectionFactory)
-                .cacheDefaults(redisCacheConfiguration)
+                        .fromSerializer(jacksonSerializer));
+
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(config)
                 .build();
     }
 }

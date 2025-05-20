@@ -75,12 +75,13 @@ public class PatientController {
      */
     @PostMapping
     @Operation(summary = "Create a new patient", description = "Add a new patient to the system.")
-    public ResponseEntity<ApiResponse> createPatient(
+    public ResponseEntity<PatientResponseDTO> createPatient(
             @Validated({Default.class, CreatePatientValidationGroup.class}) @RequestBody PatientRequestDT0 patientRequest) {
 
-        patientService.createPatient(patientRequest);
+        PatientResponseDTO createdPatient = patientService.createPatient(patientRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse("Patient successfully created", LocalDateTime.now()));
+                .body(createdPatient);
+                //.body(new ApiResponse("Patient successfully created", LocalDateTime.now()));
     }
 
     /**
