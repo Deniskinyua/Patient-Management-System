@@ -9,6 +9,10 @@ import com.pms.pmsmodule.Repository.PatientRepository;
 import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -43,9 +47,12 @@ public class PatientService {
      *
      * @return a list of {@link PatientResponseDTO} objects
      */
+    @Cacheable(value = "PATIENT_CACHE", key = "'ALL'")
     public List<PatientResponseDTO> getAllPatients(){
-        List<Patient> patients = patientRepository.findAll();
-        return patients.stream()
+
+        List<Patient>  allPatients = patientRepository.findAll();
+
+       return allPatients.stream()
                 .filter(patient -> !patient.isDeleted())
                 .map(PatientMapper::mapModelToDTO)
                 .toList();
@@ -58,6 +65,7 @@ public class PatientService {
      * @return corresponding {@link PatientResponseDTO}
      * @throws PatientNotFoundException if the patient is not found or marked as deleted
      */
+    @Cacheable(value = "PATIENT_CACHE", key = "#id")
     public PatientResponseDTO getPatientById(UUID id){
         Patient patient = patientRepository.findByIdAndDeletedFalse(id).orElseThrow(
                 () -> new PatientNotFoundException("Patient not found"));
@@ -73,14 +81,17 @@ public class PatientService {
      * @return the created or reactivated {@link PatientResponseDTO}
      * @throws EmailAlreadyExistsException if an active patient with the same email exists
      */
+
     public PatientResponseDTO createPatient(PatientRequestDT0 patientRequestDT0){
         String email = patientRequestDT0.getEmail();
+
+
+
+        Optional<Patient> softDeletedPatientOpt = patientRepository.findByEmailAndDeletedTrue(email);
 
         if (patientRepository.existsByEmailAndDeletedFalse(email)) {
             throw new EmailAlreadyExistsException("A patient with this email already exists");
         }
-
-        Optional<Patient> softDeletedPatientOpt = patientRepository.findByEmailAndDeletedTrue(email);
 
         if (softDeletedPatientOpt.isPresent()) {
             Patient softDeletedPatient = softDeletedPatientOpt.get();
@@ -110,6 +121,7 @@ public class PatientService {
      * @throws PatientNotFoundException if the patient doesn't exist or is deleted
      * @throws EmailAlreadyExistsException if another patient already uses the provided email
      */
+    @CachePut(value = "PATIENT_CACHE", key = "#patientId")
     public PatientResponseDTO updatePatientData(UUID patientId, PatientRequestDT0 patientData) {
         Patient getPatient = patientRepository.findByIdAndDeletedFalse(patientId).orElseThrow(
                 () -> new PatientNotFoundException("Patient not found"));
@@ -136,6 +148,7 @@ public class PatientService {
      * @throws PatientNotFoundException if patient not found or already deleted
      */
     @Transactional
+    @CacheEvict(value = "PATIENT_CACHE", key = "#id")
     public void deletePatient(UUID id){
         Patient patient = patientRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new PatientNotFoundException("Patient not found."));
@@ -143,7 +156,6 @@ public class PatientService {
         patient.setDeleted(true);
         patientRepository.save(patient);
 
-        // TODO: Add audit logging for traceability
         // auditLogger.logAction("DELETE", "Patient", id.toString() + " deleted");
 
         log.info("Patient with Id: {} deleted", id);
