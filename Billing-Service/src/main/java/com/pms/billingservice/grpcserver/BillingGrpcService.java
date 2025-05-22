@@ -6,6 +6,8 @@ import billing.BillingServiceGrpc.BillingServiceImplBase;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * gRPC service implementation for billing operations.
@@ -23,9 +25,11 @@ import net.devh.boot.grpc.server.service.GrpcService;
  * @version 1.0
  * @since 2025-05-22
  */
-@Slf4j
+
 @GrpcService
 public class BillingGrpcService extends BillingServiceImplBase {
+
+    private static final Logger log = LoggerFactory.getLogger(BillingGrpcService.class);
 
     /**
      * Handles the gRPC request to create a new billing account.
