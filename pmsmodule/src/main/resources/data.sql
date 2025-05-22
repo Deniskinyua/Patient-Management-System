@@ -1,13 +1,18 @@
--- Ensure the 'patient' table exists
--- CREATE TABLE IF NOT EXISTS patient
--- (
---     id              UUID PRIMARY KEY,
---     name            VARCHAR(255)        NOT NULL,
---     email           VARCHAR(255) UNIQUE NOT NULL,
---     address         VARCHAR(255)        NOT NULL,
---     date_of_birth   DATE                NOT NULL,
---     registered_date DATE                NOT NULL
--- );
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS patient
+(
+    id              UUID PRIMARY KEY,
+    name            VARCHAR(255)        NOT NULL,
+    email           VARCHAR(255) UNIQUE NOT NULL,
+    address         VARCHAR(255)        NOT NULL,
+    date_of_birth   DATE                NOT NULL,
+    registered_date DATE                NOT NULL,
+    deleted         BOOLEAN                 NOT NULL
+);
+
+--ALTER TABLE patient ADD deleted BIT DEFAULT 0;
 
 -- Insert well-known UUIDs for specific patients
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -17,7 +22,7 @@ SELECT '123e4567-e89b-12d3-a456-426614174000',
        '123 Main St, Springfield',
        '1985-06-15',
        '2024-01-10',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1
                   FROM patient
                   WHERE id = '123e4567-e89b-12d3-a456-426614174000');
@@ -29,7 +34,7 @@ SELECT '123e4567-e89b-12d3-a456-426614174001',
        '456 Elm St, Shelbyville',
        '1990-09-23',
        '2023-12-01',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1
                   FROM patient
                   WHERE id = '123e4567-e89b-12d3-a456-426614174001');
@@ -41,7 +46,7 @@ SELECT '123e4567-e89b-12d3-a456-426614174002',
        '789 Oak St, Capital City',
        '1978-03-12',
        '2022-06-20',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1
                   FROM patient
                   WHERE id = '123e4567-e89b-12d3-a456-426614174002');
@@ -53,7 +58,7 @@ SELECT '123e4567-e89b-12d3-a456-426614174003',
        '321 Pine St, Springfield',
        '1982-11-30',
        '2023-05-14',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1
                   FROM patient
                   WHERE id = '123e4567-e89b-12d3-a456-426614174003');
@@ -65,7 +70,7 @@ SELECT '123e4567-e89b-12d3-a456-426614174004',
        '654 Maple St, Shelbyville',
        '1995-02-05',
        '2024-03-01',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1
                   FROM patient
                   WHERE id = '123e4567-e89b-12d3-a456-426614174004');
@@ -78,7 +83,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174005',
        '987 Cedar St, Springfield',
        '1988-07-25',
        '2024-02-15',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174005');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -88,7 +93,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174006',
        '123 Birch St, Shelbyville',
        '1992-04-18',
        '2023-08-25',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174006');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -98,7 +103,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174007',
        '456 Ash St, Capital City',
        '1975-01-11',
        '2022-10-10',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174007');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -108,7 +113,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174008',
        '789 Palm St, Springfield',
        '1989-09-02',
        '2024-04-20',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174008');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -118,7 +123,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174009',
        '321 Cherry St, Shelbyville',
        '1993-11-15',
        '2023-06-30',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174009');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -128,7 +133,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174010',
        '654 Spruce St, Capital City',
        '1980-08-09',
        '2023-01-22',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174010');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -138,7 +143,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174011',
        '987 Redwood St, Springfield',
        '1984-05-03',
        '2024-05-12',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174011');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -148,7 +153,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174012',
        '123 Hickory St, Shelbyville',
        '1991-12-25',
        '2022-11-11',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174012');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -158,7 +163,7 @@ SELECT '223e4567-e89b-12d3-a456-426614174013',
        '456 Cypress St, Capital City',
        '1976-06-08',
        '2023-09-19',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174013');
 
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date, deleted)
@@ -168,5 +173,5 @@ SELECT '223e4567-e89b-12d3-a456-426614174014',
        '789 Willow St, Springfield',
        '1987-10-17',
        '2024-03-29',
-       0
+       false
     WHERE NOT EXISTS (SELECT 1 FROM patient WHERE id = '223e4567-e89b-12d3-a456-426614174014');
