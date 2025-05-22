@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,5 +39,6 @@ public class Patient {
     @NotNull
     private LocalDate registeredDate;
 
+    @Column(name = "deleted")
     private boolean deleted = false;
 }
