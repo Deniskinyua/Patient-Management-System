@@ -6,10 +6,12 @@ import com.pms.pmsmodule.ExceptionHandlers.EmailAlreadyExistsException;
 import com.pms.pmsmodule.ExceptionHandlers.PatientNotFoundException;
 import com.pms.pmsmodule.Mapper.PatientMapper;
 import com.pms.pmsmodule.Repository.PatientRepository;
+import com.pms.pmsmodule.grpcClient.BillingServiceGrpcClient;
 import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,18 +31,21 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
     /**
      * Constructor for dependency injection.
      *
      * @param patientRepository repository used to access patient data
      */
-    public PatientService(PatientRepository patientRepository){
-        this.patientRepository = patientRepository;
-    }
+//    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient){
+//        this.patientRepository = patientRepository;
+//        this.billingServiceGrpcClient = billingServiceGrpcClient;
+//    }
 
     /**
      * Retrieves a list of all active (non-deleted) patients.
@@ -85,8 +90,6 @@ public class PatientService {
     public PatientResponseDTO createPatient(PatientRequestDT0 patientRequestDT0){
         String email = patientRequestDT0.getEmail();
 
-
-
         Optional<Patient> softDeletedPatientOpt = patientRepository.findByEmailAndDeletedTrue(email);
 
         if (patientRepository.existsByEmailAndDeletedFalse(email)) {
@@ -103,11 +106,16 @@ public class PatientService {
             softDeletedPatient.setRegisteredDate(LocalDate.parse(patientRequestDT0.getRegisteredDate()));
 
             Patient reactivatedPatient = patientRepository.save(softDeletedPatient);
+            billingServiceGrpcClient.createBillingAccount(reactivatedPatient.getId().toString(), reactivatedPatient.getName(),
+                    reactivatedPatient.getEmail());
             return PatientMapper.mapModelToDTO(reactivatedPatient);
         }
 
         Patient newPatient = PatientMapper.mapDTOtoModel(patientRequestDT0);
         Patient savedPatient = patientRepository.save(newPatient);
+        //create a Billing account for the patient after creation
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(),
+                newPatient.getEmail());
         return PatientMapper.mapModelToDTO(savedPatient);
     }
 
