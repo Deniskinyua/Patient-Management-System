@@ -29,4 +29,5 @@ public class PatientRequestDT0 {
     private String registeredDate;
 
     private boolean deleted;
+
 }
