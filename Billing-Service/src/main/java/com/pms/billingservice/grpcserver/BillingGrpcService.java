@@ -4,7 +4,6 @@ import billing.BillingRequest;
 import billing.BillingResponse;
 import billing.BillingServiceGrpc.BillingServiceImplBase;
 import io.grpc.stub.StreamObserver;
-import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 @GrpcService
 public class BillingGrpcService extends BillingServiceImplBase {
+    //BillingServiceImplBase
 
     private static final Logger log = LoggerFactory.getLogger(BillingGrpcService.class);
 
