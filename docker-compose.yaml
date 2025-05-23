@@ -1,6 +1,6 @@
 
 services:
-  app:
+  pms-service:
     build: pmsmodule
     container_name: patient-service-api
     ports:
@@ -9,12 +9,24 @@ services:
       - postgres
       - redis
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patient_management_system
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: Dennis123
       SPRING_REDIS_HOST: redis
     networks:
       - pms-network
+
+  billing-service:
+      build: Billing-Service
+      container_name: billing-service-api
+      ports:
+        - "4001:4001"
+        - "9001:9001"
+      depends_on:
+        - pms-service
+      networks:
+        - pms-network
+
 
   postgres:
     image: postgres:16
@@ -22,9 +34,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: patient_management_system
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Dennis123
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
     networks:
