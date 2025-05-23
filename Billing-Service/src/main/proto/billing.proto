@@ -1,0 +1,48 @@
+// =============================================================================
+// Billing Service Protocol Buffers Definition
+// -----------------------------------------------------------------------------
+// This file defines the gRPC service and message contracts for the Billing
+// microservice. It follows proto3 syntax and industry best practices for
+// interoperability, maintainability, and clarity.
+// =============================================================================
+
+syntax = "proto3";
+
+// Generate multiple Java files (one per message/service) for better modularity.
+option java_multiple_files = true;
+
+// Specify the Java package for generated classes.
+option java_package = "billing";
+
+// -----------------------------------------------------------------------------
+// BillingService
+// -----------------------------------------------------------------------------
+// Exposes RPC methods for billing account management.
+// -----------------------------------------------------------------------------
+service BillingService {
+  // Creates a new billing account for a patient.
+  // Accepts: BillingRequest
+  // Returns: BillingResponse
+  rpc CreateBillingAccount (BillingRequest) returns (BillingResponse);
+}
+
+// -----------------------------------------------------------------------------
+// BillingRequest
+// -----------------------------------------------------------------------------
+// Request message for creating a billing account.
+// -----------------------------------------------------------------------------
+message BillingRequest {
+  string patientId = 1; // Unique identifier for the patient (UUID recommended)
+  string name = 2;      // Full name of the patient
+  string email = 3;     // Email address of the patient
+}
+
+// -----------------------------------------------------------------------------
+// BillingResponse
+// -----------------------------------------------------------------------------
+// Response message for billing account creation.
+// -----------------------------------------------------------------------------
+message BillingResponse {
+  string accountId = 1; // Unique identifier for the created billing account
+  string status = 2;    // Operation status (e.g., "SUCCESS", "FAILED")
+}
