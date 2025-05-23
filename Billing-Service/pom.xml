@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<protobuf.version>3.25.0</protobuf.version>
+		<grpc.version>1.61.0</grpc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -95,6 +97,19 @@
 			</extension>
 		</extensions>
 		<plugins>
+			<plugin>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.7.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>detect</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- PROTO -->
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
