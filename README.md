@@ -2,6 +2,8 @@
 
 THealth is an enterprise-grade patient management system that provdes apis to be consumed in managing patients in any health facility/entity.
 
+> View how I track the project development (agile) on Atlassian: https://kimenjudenis.atlassian.net/browse
+
 ### **Technology Stack Used**
 ##### Programming Languages: 
 > Java, Spring boot
