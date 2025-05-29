@@ -8,6 +8,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - kafka
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -37,7 +38,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: patient_management_system
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USER:  ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
@@ -51,17 +52,24 @@ services:
       - "6379:6379"
     networks:
       - pms-network
-
+    # ...existing code...
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     ports:
-      - "9092:9092"
+      - "9092:9092"  # Internal Docker network access
+      - "9094:9094"  # External host access
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      #KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
     depends_on:
       - zookeeper
     networks:
@@ -77,6 +85,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - pms-network
+volumes:
+  kafka-data:
 
 networks:
   pms-network:
