@@ -12,6 +12,8 @@ import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -30,11 +32,12 @@ import java.util.UUID;
  *
  * @author DenisKinyua
  */
-@Slf4j
+
 @Service
 @AllArgsConstructor
 public class PatientService {
 
+    private static final Logger log = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
     private final KafkaProducer kafkaProducer;
@@ -44,13 +47,6 @@ public class PatientService {
      *
      * @param patientRepository repository used to access patient data
      */
-//    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient,
-//                          KafkaProducer kafkaProducer){
-//        this.patientRepository = patientRepository;
-//        this.billingServiceGrpcClient = billingServiceGrpcClient;
-//        this.kafkaProducer = kafkaProducer;
-//    }
-
     /**
      * Retrieves a list of all active (non-deleted) patients.
      *
@@ -112,19 +108,18 @@ public class PatientService {
             Patient reactivatedPatient = patientRepository.save(softDeletedPatient);
             billingServiceGrpcClient.createBillingAccount(reactivatedPatient.getId().toString(), reactivatedPatient.getName(),
                     reactivatedPatient.getEmail());
+            kafkaProducer.sendEvent(reactivatedPatient);
             return PatientMapper.mapModelToDTO(reactivatedPatient);
         }
 
         Patient newPatient = PatientMapper.mapDTOtoModel(patientRequestDT0);
         Patient savedPatient = patientRepository.save(newPatient);
         //create a Billing account for the patient after creation
-        try{
-            billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(),
-                    newPatient.getEmail());
-            kafkaProducer.sendEvent(newPatient);
-        } catch (Exception e){
-            log.error("Error during creation",e);
-        }
+
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
+                newPatient.getName(),
+                newPatient.getEmail());
+        kafkaProducer.sendEvent(savedPatient);
 
         return PatientMapper.mapModelToDTO(savedPatient);
     }
@@ -177,5 +172,6 @@ public class PatientService {
         // auditLogger.logAction("DELETE", "Patient", id.toString() + " deleted");
 
         log.info("Patient with Id: {} deleted", id);
+
     }
 }
