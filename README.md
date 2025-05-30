@@ -30,3 +30,4 @@ THealth is an enterprise-grade patient management system that provdes apis to be
 ![Deployment-Architecture](https://github.com/user-attachments/assets/3a9238bd-0fbc-47e7-91af-4606b0c157d4)
 
 
+Adding Kafka and Zookeeper in the Patient Management System
