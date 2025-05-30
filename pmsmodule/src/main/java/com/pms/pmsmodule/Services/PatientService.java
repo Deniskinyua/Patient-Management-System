@@ -7,6 +7,7 @@ import com.pms.pmsmodule.ExceptionHandlers.PatientNotFoundException;
 import com.pms.pmsmodule.Mapper.PatientMapper;
 import com.pms.pmsmodule.Repository.PatientRepository;
 import com.pms.pmsmodule.grpcClient.BillingServiceGrpcClient;
+import com.pms.pmsmodule.kafka.KafkaProducer;
 import com.pms.pmsmodule.model.Patient;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -36,15 +37,18 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final KafkaProducer kafkaProducer;
 
     /**
      * Constructor for dependency injection.
      *
      * @param patientRepository repository used to access patient data
      */
-//    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient){
+//    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient,
+//                          KafkaProducer kafkaProducer){
 //        this.patientRepository = patientRepository;
 //        this.billingServiceGrpcClient = billingServiceGrpcClient;
+//        this.kafkaProducer = kafkaProducer;
 //    }
 
     /**
@@ -114,8 +118,14 @@ public class PatientService {
         Patient newPatient = PatientMapper.mapDTOtoModel(patientRequestDT0);
         Patient savedPatient = patientRepository.save(newPatient);
         //create a Billing account for the patient after creation
-        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(),
-                newPatient.getEmail());
+        try{
+            billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(),
+                    newPatient.getEmail());
+            kafkaProducer.sendEvent(newPatient);
+        } catch (Exception e){
+            log.error("Error during creation",e);
+        }
+
         return PatientMapper.mapModelToDTO(savedPatient);
     }
 
