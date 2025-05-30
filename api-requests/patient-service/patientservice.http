@@ -1,0 +1,18 @@
+### GET all patients
+GET http://localhost:4000/api/v1/patients
+
+### GET single patient by id
+GET http://localhost:4000/api/v1/patients/223e4567-e89b-12d3-a456-426614174008
+
+### POST add a patient to database
+POST localhost//localhost:4000/api/v1/patients
+Content-Type: application/json
+##Authorization: Bearer {{token}}
+
+{
+  "name": "John Doe Billing Account Test",
+  "email": "BillingAccount@example.com",
+  "address": "123 main street22",
+  "dateOfBirth": "1995-09-09",
+  "registeredDate": "2024-11-28"
+}
