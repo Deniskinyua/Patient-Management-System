@@ -3,6 +3,8 @@ package com.pms.pmsmodule.CommonLogger;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,10 +20,12 @@ import org.springframework.stereotype.Component;
  * @author DenisKinyua
  * @since 1.0
  */
-@Slf4j
+
 @Aspect
 @Component
 public class CommonLoggerAspect {
+
+    private static final Logger log = LoggerFactory.getLogger(CommonLoggerAspect.class);
 
     /**
      * Logs the execution details of controller methods.
@@ -41,6 +45,7 @@ public class CommonLoggerAspect {
 
         // Log method entry with parameters
         log.info("➡️ [Controller] Entering: {}.{}() with arguments: {}", className, methodName, args);
+
 
         long start = System.currentTimeMillis();
 
