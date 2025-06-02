@@ -60,7 +60,6 @@ public class KafkaProducer {
             log.info("Event PATIENT_CREATED sent successfully for patientId={}", patient.getId());
         } catch (Exception exception) {
             log.error("Error sending PATIENT_CREATED event for patientId={}", patient.getId(), exception);
-            log.debug("Failed event payload: {}", patientEvent);
         }
     }
 }

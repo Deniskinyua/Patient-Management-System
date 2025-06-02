@@ -17,7 +17,7 @@ import java.time.LocalDate;
  * This class follows a static utility pattern to avoid unnecessary instantiation.
  * </p>
  *
- * @author ---
+ * @author DenisKinyua
  * @since 1.0
  */
 public class PatientMapper {
