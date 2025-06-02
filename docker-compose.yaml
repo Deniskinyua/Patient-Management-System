@@ -32,7 +32,15 @@ services:
         - pms-service
       networks:
         - pms-network
-
+  analytics-service:
+    build: Analytics-Service
+    container_name: analytics-service
+    ports:
+      - "4002:4002"
+    depends_on:
+      - pms-service
+    networks:
+      - pms-network
 
   postgres:
     image: postgres:16
