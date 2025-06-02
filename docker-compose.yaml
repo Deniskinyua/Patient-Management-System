@@ -12,8 +12,8 @@ services:
       - kafka
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patient_management_system
-      SPRING_DATASOURCE_USERNAME: #${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD:  #${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_USERNAME:  #${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD:   #${SPRING_DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
@@ -33,8 +33,10 @@ services:
       networks:
         - pms-network
   analytics-service:
-    build: Analytics-Service
+    build: AnalyticsService
     container_name: analytics-service
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "4002:4002"
     depends_on:
@@ -50,7 +52,7 @@ services:
     environment:
       POSTGRES_DB: patient_management_system
       POSTGRES_USER:  #${POSTGRES_USER}
-      POSTGRES_PASSWORD: #${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD:  #${POSTGRES_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
     networks:
