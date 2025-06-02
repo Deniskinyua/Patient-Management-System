@@ -22,7 +22,7 @@ public class KafkaConsumer {
                     patientEvent.getName(),
                     patientEvent.getEmail());
             //Perform analytics logic here...
-            
+
         }catch (InvalidProtocolBufferException e){
             log.error("Error deserializing event {}", e.getMessage());
         }
