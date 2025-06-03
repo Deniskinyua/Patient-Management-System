@@ -6,17 +6,17 @@ spring:
     gateway:
       routes:
         - id: patient-service-route
-          uri: http://patient-service:4000
+          uri: http://pms-service:4000
           predicates:
-            - path=/api/patients/**
-          filters:
-            - strip-prefix=1
+            - Path=/api/v1/patients/**
+#          filters:
+#            - StripPrefix=1
 
         - id: api-docs-patient-route
-          uri: http://patient-service"4000
+          uri: http://patient-service:4000
           predicates:
-            - path=/api-docs/patients
+            - Path=/api-docs/patients
           filters:
-            - rewrite-path=/api-docs/patients,/v3/api-docs
+            - RewritePath=/api-docs/patients,/v3/api-docs
 
 
