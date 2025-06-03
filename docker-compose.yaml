@@ -4,8 +4,8 @@ services:
   pms-service:
     build: pmsmodule
     container_name: patient-service-api
-    ports:
-      - "4000:4000"
+    #ports:
+      #- "4000:4000"
     depends_on:
       - postgres
       - redis
@@ -13,7 +13,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patient_management_system
       SPRING_DATASOURCE_USERNAME:  #${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD:   #${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD:  #${SPRING_DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
@@ -52,7 +52,7 @@ services:
     environment:
       POSTGRES_DB: patient_management_system
       POSTGRES_USER:  #${POSTGRES_USER}
-      POSTGRES_PASSWORD:  #${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
     networks:
@@ -83,6 +83,19 @@ services:
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
+
+  api-gateway:
+    image: api-gateway:latest
+    container_name: api-gateway
+    build:
+      context: ./api-gateway
+    ports:
+      - "4004:4004"
+    depends_on:
+      - pms-service
+    networks:
+      - pms-network
+
 
 networks:
   pms-network:
