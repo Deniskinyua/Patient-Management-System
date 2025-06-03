@@ -9,14 +9,11 @@ spring:
           uri: http://pms-service:4000
           predicates:
             - Path=/api/v1/patients/**
-#          filters:
-#            - StripPrefix=1
+
 
         - id: api-docs-patient-route
-          uri: http://patient-service:4000
+          uri: http://pms-service:4000
           predicates:
-            - Path=/api-docs/patients
-          filters:
-            - RewritePath=/api-docs/patients,/v3/api-docs
+            - Path=/v3/api-docs
 
 
