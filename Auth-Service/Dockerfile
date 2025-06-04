@@ -7,7 +7,7 @@ WORKDIR /app
 COPY /target/*.jar app.jar
 
 # Expose the application port
-EXPOSE 4000
+EXPOSE 4005
 
 # Use wait-for-it to ensure SQL Server is ready before starting the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
