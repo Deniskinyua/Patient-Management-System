@@ -4,8 +4,8 @@ services:
   pms-service:
     build: pmsmodule
     container_name: patient-service-api
-    #ports:
-      #- "4000:4000"
+#    ports:
+#      - "4000:4000"
     depends_on:
       - postgres
       - redis
@@ -51,7 +51,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: patient_management_system
-      POSTGRES_USER:  #${POSTGRES_USER}
+      POSTGRES_USER:   #${POSTGRES_USER}
       POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
