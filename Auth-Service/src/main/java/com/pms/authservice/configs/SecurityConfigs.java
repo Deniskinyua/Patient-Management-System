@@ -7,15 +7,53 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Configuration class for Spring Security settings.
+ * <p>
+ * Defines security filter chains and password encoding strategies for the application.
+ * </p>
+ *
+ * <ul>
+ *   <li>
+ *     <b>SecurityFilterChain:</b> Configures HTTP security to permit all requests.
+ *     This can be customized to restrict access to certain endpoints as needed.
+ *   </li>
+ *   <li>
+ *     <b>PasswordEncoder:</b> Provides a BCrypt-based password encoder bean for secure password hashing.
+ *   </li>
+ * </ul>
+ *
+ * @author Denis Kinyua
+ * @since 1.0
+ */
 @Configuration
 public class SecurityConfigs {
 
+    /**
+     * Configures the application's HTTP security.
+     * <p>
+     * Currently, all requests are permitted without authentication.
+     * Modify this method to restrict access to specific endpoints as required.
+     * </p>
+     *
+     * @param httpSecurity the {@link HttpSecurity} to modify
+     * @return the configured {@link SecurityFilterChain}
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
         return httpSecurity.build();
     }
 
+    /**
+     * Provides a BCrypt password encoder bean.
+     * <p>
+     * This encoder is used for hashing and verifying user passwords securely.
+     * </p>
+     *
+     * @return a {@link PasswordEncoder} instance using BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
