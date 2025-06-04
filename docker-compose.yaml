@@ -3,22 +3,37 @@ services:
 
   pms-service:
     build: pmsmodule
-    container_name: patient-service-api
+    container_name: patient-service
 #    ports:
 #      - "4000:4000"
     depends_on:
-      - postgres
+      - patient-postgres-db
       - redis
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patient_management_system
-      SPRING_DATASOURCE_USERNAME:  #${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD:  #${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-postgres-db:5432/patient_management_system
+      SPRING_DATASOURCE_USERNAME:   #${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD:   #${SPRING_DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - pms-network
 
+  auth-service:
+    build: Auth-Service
+    container_name: auth-service
+    ports:
+      - "4005:4005"
+    depends_on:
+      - auth-postgres-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-postgres-db:5432/auth_service_db
+      SPRING_DATASOURCE_USERNAME: #${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: #${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
     networks:
       - pms-network
 
@@ -32,6 +47,7 @@ services:
         - pms-service
       networks:
         - pms-network
+
   analytics-service:
     build: AnalyticsService
     container_name: analytics-service
@@ -44,9 +60,9 @@ services:
     networks:
       - pms-network
 
-  postgres:
+  patient-postgres-db:
     image: postgres:16
-    container_name: patient-service-db
+    container_name: patient_service_db
     ports:
       - "5432:5432"
     environment:
@@ -55,6 +71,22 @@ services:
       POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
+      - /Users/denis.the.dev/pgdata/patient-service:/var/lib/postgresql/data
+    networks:
+      - pms-network
+
+  auth-postgres-db:
+    image: postgres:16
+    container_name: auth_service_db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: auth_service_db
+      POSTGRES_USER:   #${POSTGRES_USER}
+      POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
+    volumes:
+      - ./Auth-Service/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
+      - /Users/denis.the.dev/pgdata/auth-service:/var/lib/postgresql/data
     networks:
       - pms-network
 
