@@ -4,16 +4,14 @@ services:
   pms-service:
     build: pmsmodule
     container_name: patient-service
-#    ports:
-#      - "4000:4000"
     depends_on:
       - patient-postgres-db
       - redis
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-postgres-db:5432/patient_management_system
-      SPRING_DATASOURCE_USERNAME:   #${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD:   #${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
@@ -27,11 +25,11 @@ services:
     ports:
       - "4005:4005"
     depends_on:
-      - auth-postgres-db
+      - patient-postgres-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-postgres-db:5432/auth_service_db
-      SPRING_DATASOURCE_USERNAME: #${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: #${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
     networks:
@@ -39,7 +37,7 @@ services:
 
   billing-service:
       build: Billing-Service
-      container_name: billing-service-api
+      container_name: billing-service
       ports:
         - "4001:4001"
         - "9001:9001"
@@ -57,6 +55,7 @@ services:
       - "4002:4002"
     depends_on:
       - pms-service
+      - kafka
     networks:
       - pms-network
 
@@ -67,29 +66,13 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: patient_management_system
-      POSTGRES_USER:   #${POSTGRES_USER}
-      POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
-      - /Users/denis.the.dev/pgdata/patient-service:/var/lib/postgresql/data
     networks:
       - pms-network
-
-  auth-postgres-db:
-    image: postgres:16
-    container_name: auth_service_db
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_DB: auth_service_db
-      POSTGRES_USER:   #${POSTGRES_USER}
-      POSTGRES_PASSWORD:   #${POSTGRES_PASSWORD}
-    volumes:
-      - ./Auth-Service/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
-      - /Users/denis.the.dev/pgdata/auth-service:/var/lib/postgresql/data
-    networks:
-      - pms-network
-
+      -
   redis:
     image: redis:7.4.2
     container_name: patient-service-redis
@@ -105,8 +88,6 @@ services:
     ports:
       - "9092:9092"
       - "9094:9094"
-    networks:
-      - pms-network
     environment:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
@@ -115,6 +96,8 @@ services:
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
+    networks:
+      - pms-network
 
   api-gateway:
     image: api-gateway:latest
