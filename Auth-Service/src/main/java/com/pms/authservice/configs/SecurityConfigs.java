@@ -3,6 +3,9 @@ package com.pms.authservice.configs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,7 +30,12 @@ import org.springframework.security.web.SecurityFilterChain;
  * @since 1.0
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfigs {
+
+    public SecurityConfigs() {
+        System.out.println("🔧 SecurityConfig loaded!");
+    }
 
     /**
      * Configures the application's HTTP security.
@@ -42,7 +50,14 @@ public class SecurityConfigs {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+        System.out.println("🔧 SecurityFilterChain bean created!");
+        httpSecurity.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
+        System.out.println("🔧 SecurityFilterChain bean finished creation!");
+
         return httpSecurity.build();
     }
 
