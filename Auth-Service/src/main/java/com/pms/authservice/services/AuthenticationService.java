@@ -2,6 +2,7 @@ package com.pms.authservice.services;
 
 import com.pms.authservice.dto.LoginRequestDTO;
 import com.pms.authservice.utils.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,24 @@ public class AuthenticationService {
                 .map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole()));
 
         return token;
+    }
+
+    /**
+     * Validates the JWT token sent by the request
+     * <p>
+     *     If JWT token is successfully validated, return true else return false
+     * </p>
+     * @param jwtToken The token extracted from the request header
+     * @return A boolean affirming validation or not
+     */
+
+    public boolean validateToken(String jwtToken) {
+        try{
+            jwtUtil.validateToken(jwtToken);
+            return true;
+        }
+        catch (JwtException jwtException){
+            return false;
+        }
     }
 }
