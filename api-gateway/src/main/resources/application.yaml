@@ -14,6 +14,8 @@ spring:
           uri: http://pms-service:4000
           predicates:
             - Path=/api/v1/patients/**
+          filters:
+            - JwtValidation
 
 
         - id: api-docs-patient-route
