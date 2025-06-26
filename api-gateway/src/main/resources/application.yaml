@@ -9,6 +9,10 @@ spring:
 #          uri: http://auth-service:4005
 #          predicates:
 #            - Path=/auth/**
+        - id: authentication-service-route
+          uri: http:auth-service:4005
+          predicates:
+            - Path=/auth/**
 
         - id: patient-service-route
           uri: http://pms-service:4000
