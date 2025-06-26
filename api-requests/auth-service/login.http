@@ -7,8 +7,9 @@ Content-Type: application/json
   "email": "testuser@test.com",
   "password": "password123"
 }
+> {% client.global.set("jwtToken", response.body.jwtToken) %}
 
-### Get Alll
+### Get All
 GET http://localhost:4005/auth/login
 
 

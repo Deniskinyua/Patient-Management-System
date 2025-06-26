@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,5 +61,16 @@ public class AuthenticationController {
         }
         String convertedToken = token.get();
         return ResponseEntity.ok(new LoginResponseDTO(convertedToken));
+    }
+
+    @Operation(summary = "Validate JWT Token")
+    @GetMapping("/validate")
+    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authorizationHeader){
+        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED);
+        }
+        return authenticationService.validateToken(authorizationHeader.substring(7))
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

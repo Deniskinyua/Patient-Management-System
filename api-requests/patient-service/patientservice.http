@@ -2,10 +2,10 @@
 GET http://localhost:4004/api/v1/patients
 
 ### GET single patient by id
-GET http://localhost:4000/api/v1/patients/223e4567-e89b-12d3-a456-426614174008
+GET http://localhost:4004/api/v1/patients/7b9095ff-2b70-48a0-82c9-c2f855363cbb
 
 ### POST add a patient to database
-POST localhost//localhost:4000/api/v1/patients
+POST http://localhost:4004/api/v1/patients
 Content-Type: application/json
 ##Authorization: Bearer {{token}}
 
