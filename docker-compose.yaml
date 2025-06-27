@@ -9,9 +9,9 @@ services:
       - redis
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-postgres-db:<port>/<database>
+      SPRING_DATASOURCE_USERNAME:  #${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD:  #${DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
@@ -22,14 +22,12 @@ services:
   auth-service:
     build: Auth-Service
     container_name: auth-service
-    ports:
-      - "4005:4005"
     depends_on:
       - patient-postgres-db
     environment:
-      SPRING_DATASOURCE_URL: ${DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-postgres-db:<port>/<database>
+      SPRING_DATASOURCE_USERNAME: #${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: #${DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
     networks:
@@ -66,13 +64,12 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: patient_management_system
-      POSTGRES_USER: ${DATASOURCE_USERNAME}
-      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+      POSTGRES_USER: #${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD:  #${DATASOURCE_PASSWORD}
     volumes:
       - ./pmsmodule/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql
     networks:
       - pms-network
-      -
   redis:
     image: redis:7.4.2
     container_name: patient-service-redis
@@ -104,10 +101,13 @@ services:
     container_name: api-gateway
     build:
       context: ./api-gateway
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:4005
     ports:
       - "4004:4004"
     depends_on:
       - pms-service
+      - auth-service
     networks:
       - pms-network
 
