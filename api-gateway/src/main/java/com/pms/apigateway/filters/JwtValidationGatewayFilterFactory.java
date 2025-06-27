@@ -14,7 +14,7 @@ public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFact
     public  final WebClient webClient;
 
     public JwtValidationGatewayFilterFactory(
-            WebClient.Builder webClientBuilder, @Value("${authentication.service.url}") String authenticationServiceUrl){
+            WebClient.Builder webClientBuilder, @Value("${auth.service.url}") String authenticationServiceUrl){
         this.webClient = webClientBuilder.baseUrl(authenticationServiceUrl).build();
     }
 
@@ -26,7 +26,7 @@ public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFact
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
-            return webClient.get().uri("/validate").header(HttpHeaders.AUTHORIZATION, token)
+            return webClient.get().uri("/auth/validate").header(HttpHeaders.AUTHORIZATION, token)
                     .retrieve()
                     .toBodilessEntity()
                     .then(chain.filter(exchange));
