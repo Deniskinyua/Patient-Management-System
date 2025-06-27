@@ -9,11 +9,15 @@ spring:
           uri: http://auth-service:4005
           predicates:
             - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /auth/${segment}
 
         - id: patient-service-route
           uri: http://pms-service:4000
           predicates:
             - Path=/api/v1/patients/**
+          filters:
+            - JwtValidation
 
 
         - id: api-docs-patient-route
