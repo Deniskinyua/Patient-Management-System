@@ -1,5 +1,7 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+### GET all patients via API Gateway (4004)
+GET http://localhost:4004/api/v1/patients
+Authorization: Bearer {{jwtToken}}}
 
-###
+### GET single patient by id via API Gateway (4004)
+GET http://localhost:4004/api/v1/patients/7b9095ff-2b70-48a0-82c9-c2f855363cbb
+Authorization: Bearer {{jwtToken}}}

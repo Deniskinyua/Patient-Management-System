@@ -1,5 +1,12 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+### UPDATE add a patient to database
+PUT http://localhost:4004/api/v1/patients/223e4567-e89b-12d3-a456-426614174014
+Content-Type: application/json
+Authorization: Bearer {{jwtToken}}
 
-###
+{
+  "name": "John Doe Billing Account Test",
+  "email": "Kafka@examplel.com",
+  "address": "123 main street22",
+  "dateOfBirth": "1995-09-09",
+  "registeredDate": "2024-11-28"
+}
